@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Movie Collection</title>
+    <style>
+        :root {
+            --primary-color: #e50914;
+            --bg-color: #141414;
+            --card-bg: #232323;
+            --text-color: #ffffff;
+            --text-muted: #a3a3a3;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--primary-color);
+        }
+
+        /* Form styling */
+        .movie-form {
+            background-color: var(--card-bg);
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .movie-form input, .movie-form select, .movie-form button {
+            padding: 10px;
+            border-radius: 5px;
+            border: none;
+            font-size: 16px;
+        }
+
+        .movie-form input, .movie-form select {
+            flex: 1;
+            min-width: 150px;
+            background-color: #333;
+            color: #fff;
+        }
+
+        .movie-form button {
+            background-color: var(--primary-color);
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .movie-form button:hover {
+            background-color: #f40612;
+        }
+
+        /* Movie Grid styling */
+        .movie-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 20px;
+        }
+
+        .movie-card {
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            padding: 15px;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            transition: transform 0.2s;
+        }
+
+        .movie-card:hover {
+            transform: scale(1.03);
+        }
+
+        .movie-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .movie-info {
+            color: var(--text-muted);
+            margin-bottom: 10px;
+        }
+
+        .movie-rating {
+            font-weight: bold;
+            color: #ffcc00;
+            margin-bottom: 15px;
+        }
+
+        .delete-btn {
+            background-color: #e50914;
+            color: white;
+            border: none;
+            padding: 8px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: auto;
+            width: 100%;
+        }
+
+        .delete-btn:hover {
+            background-color: #b2070f;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>My Movie Collection</h1>
+
+    <!-- Add Movie Form -->
+    <form class="movie-form" id="movieForm">
+        <input type="text" id="title" placeholder="Movie Title" required>
+        <input type="text" id="genre" placeholder="Genre" required>
+        <input type="number" id="year" placeholder="Release Year" min="1900" max="2099" required>
+        <select id="rating" required>
+            <option value="" disabled selected>Select Rating</option>
+            <option value="⭐⭐⭐⭐⭐">⭐⭐⭐⭐⭐ (5/5)</option>
+            <option value="⭐⭐⭐⭐">⭐⭐⭐⭐ (4/5)</option>
+            <option value="⭐⭐⭐">⭐⭐⭐ (3/5)</option>
+            <option value="⭐⭐">⭐⭐ (2/5)</option>
+            <option value="⭐⭐">⭐ (1/5)</option>
+        </select>
+        <button type="submit">Add Movie</button>
+    </form>
+
+    <!-- Movie List Grid -->
+    <div class="movie-grid" id="movieGrid"></div>
+</div>
+
+<script>
+    const movieForm = document.getElementById('movieForm');
+    const movieGrid = document.getElementById('movieGrid');
+
+    // Retrieve collection from Local Storage, or start empty
+    let movies = JSON.parse(localStorage.getItem('myMovies')) || [];
+
+    // Render movies on the page
+    function renderMovies() {
+        movieGrid.innerHTML = '';
+        movies.forEach((movie, index) => {
+            const card = document.createElement('div');
+            card.classList.add('movie-card');
+            card.innerHTML = `
+                <div class="movie-title">${movie.title}</div>
+                <div class="movie-info">${movie.genre} • ${movie.year}</div>
+                <div class="movie-rating">${movie.rating}</div>
+                <button class="delete-btn" onclick="deleteMovie(${index})">Remove</button>
+            `;
+            movieGrid.appendChild(card);
+        });
+    }
+
+    // Add new movie
+    movieForm.addEventListener('submit', function(event) {
+        event.preventDefault();
+        
+        const newMovie = {
+            title: document.getElementById('title').value,
+            genre: document.getElementById('genre').value,
+            year: document.getElementById('year').value,
+            rating: document.getElementById('rating').value
+        };
+
+        movies.push(newMovie);
+        localStorage.setItem('myMovies', JSON.stringify(movies));
+        
+        renderMovies();
+        movieForm.reset();
+    });
+
+    // Delete movie
+    window.deleteMovie = function(index) {
+        movies.splice(index, 1);
+        localStorage.setItem('myMovies', JSON.stringify(movies));
+        renderMovies();
+    };
+
+    // Initial Render
+    renderMovies();
+</script>
+
+</body>
+</html>
